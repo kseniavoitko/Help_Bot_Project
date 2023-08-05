@@ -6,6 +6,7 @@ setup(
     description='The simple tool to manage contacts and notes',
     author='f"{group4_name}"',
         author_email=[
+        'kseniavoytko95@gmail.com',
         'nataliia.manushyna@gmail.com',
         'tovkun.andrii@gmail.com',
         'mr.sanscrit@gmail.com',
