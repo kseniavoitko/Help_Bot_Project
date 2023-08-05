@@ -1,4 +1,4 @@
-from help_bot_classes import AddressBook, Name, Phone, Record, Birthday, PhoneError, BirthdayError
+from help_bot.help_bot_classes import AddressBook, Name, Phone, Record, Birthday, PhoneError, BirthdayError
 
 address_book = AddressBook('address_book.dat')
 try:
@@ -137,7 +137,7 @@ def main():
         user_input = input('>>>')
         command, data = parser(user_input)
         if command == exit:
-            print('Buy!')
+            print('Bye!')
             break
         result = command(data)
         print(result)
