@@ -33,7 +33,7 @@ class Phone(Field):
 
     @value.setter
     def value(self, new_value):
-        if 10 <= len(new_value) <= 12:
+        if (len(new_value) == 10 and new_value.startswith("0")) or (len(new_value) == 12 and new_value.startswith("380")):
             self.__value = new_value
         else:
             raise PhoneError 

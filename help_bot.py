@@ -43,7 +43,7 @@ def input_error(func):
             else:
                 return 'Wrong parameters'
         except PhoneError:
-            return 'Phone must contain 10-12 numbers'
+            return 'Phone must contain 10 digits and starts with 0 or 12 digits and starts with 380'
         except BirthdayError:
             return 'Birthday format is dd.mm.yyyy'
         # except:
