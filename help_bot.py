@@ -1,10 +1,27 @@
 from help_bot_classes import AddressBook, Name, Phone, Record, Birthday, PhoneError, BirthdayError
 
+from rich.console import Console
+from rich.table import Table
+
+
 address_book = AddressBook('address_book.dat')
 try:
     address_book.read_from_file()
 except:
     pass
+
+table = Table(title="Address book")
+console = Console()
+
+def reset_table():
+    global table
+
+    table = Table(title="Address book")
+
+    table.add_column("Name", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Birthday", style="magenta")
+    table.add_column("Phones", justify="right", style="green")
+
 
 def save_to_file(func):
     def inner(args):
@@ -32,6 +49,8 @@ def input_error(func):
                 return 'Give me name and phone please'
             elif func.__name__ == 'phone':
                 return 'Give me phone please'
+            elif func.__name__ == 'birthdays':
+                return "Give me a number of days please!"
             else:
                 return 'Wrong parameters!'
         except KeyError:
@@ -40,14 +59,14 @@ def input_error(func):
         except ValueError:
             if func.__name__ == 'change':
                 return "Contact doesn't exist"
+            elif func.__name__ == 'birthdays':
+                return "Give me a number of days please!"
             else:
                 return 'Wrong parameters'
         except PhoneError:
             return 'Phone must contain 10-12 numbers'
         except BirthdayError:
             return 'Birthday format is dd.mm.yyyy'
-        # except:
-        #     return 'Wrong parameters'
     return inner
 
 
@@ -107,7 +126,24 @@ def show_all(args):
         print(rec)   
         result = 'END'  
 
-    return result   
+    return result  
+
+
+@read_from_file
+@input_error
+def birthdays(args):
+    reset_table()
+    days = int(args[0]) 
+    birthdays_list = address_book.birthdays(days)
+    if not birthdays_list:
+        return f'No birthdays in the next {days} days' 
+    for rec in birthdays_list:
+        table.add_row(str(rec.name), str(rec.birthday), ', '.join(str(p) for p in rec.phones))
+
+    console = Console()
+    console.print(table)
+
+    return ''
 
 
 def no_command(args):
@@ -120,6 +156,7 @@ COMMANDS = {
     'change': change,
     'phone': phone,
     'show all': show_all,
+    'birthdays': birthdays,
     'good bye': exit,
     'close': exit,
     'exit': exit
