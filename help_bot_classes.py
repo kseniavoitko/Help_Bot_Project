@@ -125,7 +125,9 @@ class AddressBook(UserDict):
             if not rec.birthday:
                 continue 
             birthday = rec.birthday.value
-            birthday = birthday.replace(year = current_year) if birthday.month != 1 else birthday.replace(year = current_year + 1)
+            birthday = birthday.replace(year = current_year)
+            if birthday < current_datetime:
+                birthday = birthday.replace(year = current_year + 1) 
             if 0 <= (birthday - current_datetime).days < days:
                 result.append(rec)
         
