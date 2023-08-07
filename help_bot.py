@@ -1,4 +1,4 @@
-from help_bot_classes_more_funcs import AddressBook, Name, Phone, Email, Address, Record, Birthday, PhoneError, BirthdayError, EmailError
+from help_bot_classes import AddressBook, Name, Phone, Email, Address, Record, Birthday, PhoneError, BirthdayError, EmailError
 
 from rich.console import Console
 from rich.table import Table
