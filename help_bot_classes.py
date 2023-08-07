@@ -33,7 +33,7 @@ class Phone(Field):
 
     @value.setter
     def value(self, new_value):
-        if 10 <= len(new_value) <= 12:
+        if (len(new_value) == 10 and new_value.startswith("0")) or (len(new_value) == 12 and new_value.startswith("380")):
             self.__value = new_value
         else:
             raise PhoneError 
@@ -78,17 +78,9 @@ class Record():
         phone_index = [i.value for i in self.phones].index(phone)
         self.phones.pop(phone_index)
         return 'Contact remove'
-    
-    def days_to_birthday(self):
-        current_datetime = datetime.now()
-        current_year = current_datetime.year
-        current_month = current_datetime.month
-        birthday = self.birthday.value.replace(year = current_year)
-        birthday = birthday if birthday > current_datetime else birthday.replace(year = birthday.year + 1)
-        return (birthday - current_datetime).days
 
     def __str__(self) -> str:
-        return "|{:<30}|{:^12}|{:^18}|{:>40}|".format(str(self.name), str(self.birthday), str(self.days_to_birthday()), ', '.join(str(p) for p in self.phones))
+        return "|{:<30}|{:^12}|{:>40}|".format(str(self.name), str(self.birthday), ', '.join(str(p) for p in self.phones))
     
     def __repr__(self) -> str:
         return str(self)
@@ -112,7 +104,7 @@ class AddressBook(UserDict):
         return self[key]
     
     def search_record(self, key):
-        header = "|{:<30}|{:^12}|{:^18}|{:>40}|".format('Name', 'Birthday', 'Days to birthday', 'Phones') + "\n"
+        header = "|{:<30}|{:^12}|{:>40}|".format('Name', 'Birthday', 'Phones') + "\n"
         result = ''
         for rec in self.values():
             if key.isdigit():
@@ -123,9 +115,27 @@ class AddressBook(UserDict):
                 result += str(rec) + "\n"
         if result:
             yield header + result
+
+
+    def birthdays(self, days: int):
+        current_datetime = datetime.now()
+        current_year = current_datetime.year
+        result = []
+        for rec in self.values():
+            if not rec.birthday:
+                continue 
+            birthday = rec.birthday.value
+            birthday = birthday.replace(year = current_year)
+            if birthday < current_datetime:
+                birthday = birthday.replace(year = current_year + 1) 
+            if 0 <= (birthday - current_datetime).days < days:
+                result.append(rec)
+        
+        return result
+
     
     def iterator(self, n):
-        header = "|{:<30}|{:^12}|{:^18}|{:>40}|".format('Name', 'Birthday', 'Days to birthday', 'Phones') + "\n"
+        header = "|{:<30}|{:^12}|{:>40}|".format('Name', 'Birthday', 'Phones') + "\n"
         result = header
         count = 0
         for rec in self.values():
