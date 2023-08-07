@@ -73,7 +73,7 @@ class Address(Field):
     ...
 
 class Record():
-    def __init__(self, name: Name, birthday: Birthday = None, phone: Phone = None, email: Email = None, address: Address = None) -> None:
+    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None, address: Address = None) -> None:
         self.name = name
         self.birthday = birthday
         self.phones = []
@@ -87,6 +87,18 @@ class Record():
             self.phones.append(phone)
             return f"phone {phone} add to contact {self.name}"
         return f"{phone} present in phones of contact {self.name}"
+    
+    def add_email(self, email: Email):
+        self.email = email
+        return "The email has been changed"
+    
+    def add_birthday(self, birthday: Birthday):
+        self.birthday = birthday
+        return "The birthday has been changed"
+    
+    def add_address(self, address: Address):
+        self.address = address
+        return "The adrress has been changed"
     
     def change_phone(self, old, new):
         old_ind = [i.value for i in self.phones].index(old)
