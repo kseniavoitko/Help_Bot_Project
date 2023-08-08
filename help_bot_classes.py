@@ -187,4 +187,7 @@ class AddressBook(UserDict):
 
     def read_from_file(self):
         with open(self.filename, "rb") as file:
-            self.data = pickle.load(file)
+            try:
+                self.data = pickle.load(file)
+            except:
+                pass
