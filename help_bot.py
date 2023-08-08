@@ -2,10 +2,13 @@ from help_bot_classes import (
     AddressBook,
     Name,
     Phone,
+    Email,
+    Address,
     Record,
     Birthday,
     PhoneError,
     BirthdayError,
+    EmailError,
 )
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
@@ -79,7 +82,9 @@ def input_error(func):
         except PhoneError:
             return "Phone must contain 10 digits and starts with 0 or 12 digits and starts with 380"
         except BirthdayError:
-            return "Birthday format is dd.mm.yyyy"
+            return 'Birthday format is dd.mm.yyyy'
+        except EmailError:
+            return 'Please enter your email correctly'
 
     return inner
 
@@ -92,17 +97,56 @@ def hello(args):
 @save_to_file
 def add(args):
     name = Name(args[0])
-    phone = None
-    birthday = None
-    for a in args[1:]:
-        if a.isdigit():
-            phone = Phone(a)
-        else:
-            birthday = Birthday(a)
+    rec = Record(name)
+    return address_book.add_record(rec)
+
+
+@input_error
+@save_to_file
+def add_phone(args):   
+    name = Name(args[0])
+    phone = Phone(args[1])
     rec: Record = address_book.get(str(name))
     if rec:
         return rec.add_phone(phone)
-    rec = Record(name, birthday, phone)
+    rec = Record(name, phone)
+    return address_book.add_record(rec)
+
+
+@input_error
+@save_to_file
+def add_email(args):
+    name = Name(args[0])
+    email = Email(args[1])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return rec.add_email(email)
+    rec = Record(name, email)
+    return address_book.add_record(rec)
+
+
+@input_error
+@save_to_file
+def add_birthday(args):
+    name = Name(args[0])
+    birthday = Birthday(args[1])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return rec.add_birthday(birthday)
+    rec = Record(name, birthday)
+    return address_book.add_record(rec)
+
+
+@input_error
+@save_to_file
+def add_address(args):
+    name = Name(args[0])
+    address_str = str(x for x in args[1:])
+    address = Address(address_str)
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return rec.add_address(address)
+    rec = Record(name, address)
     return address_book.add_record(rec)
 
 
@@ -167,15 +211,19 @@ def no_command(args):
 
 
 COMMANDS = {
-    "hello": hello,
-    "add": add,
-    "change": change,
-    "phone": phone,
-    "show all": show_all,
-    "birthdays": birthdays,
-    "good bye": exit,
-    "close": exit,
-    "exit": exit,
+    'hello': hello,
+    'add_phone' : add_phone,
+    'add_email' : add_email,
+    'add_birthday': add_birthday,
+    'add_address' : add_address,
+    'add': add,
+    'change': change,
+    'phone': phone,
+    'show all': show_all,
+    'birthdays': birthdays,
+    'good bye': exit,
+    'close': exit,
+    'exit': exit
 }
 
 
