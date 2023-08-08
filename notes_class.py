@@ -110,7 +110,10 @@ class Record:
 
 class Notepad(UserDict):
     def save_to_file(self):
-        path = Path(r"C:\Users\Public\Documents\notes.bin")
+        sourse = Path("notes.bin")
+        destination = Path.home()
+        path = destination.joinpath(sourse)
+        open(path, 'a').close()
         with open(path, "wb") as f:
             pickle.dump(self, f)
 
