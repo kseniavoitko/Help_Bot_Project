@@ -17,21 +17,18 @@ import shutil
 notepad = Notepad()
 
 
-def get_path():
-    src = Path("notes.bin")
-    dst = Path(r"C:\Users\Public\Documents")
-    path = dst.joinpath(src)
+def get_path() -> Path:
+    sourse = Path("notes.bin")
+    destination = Path(r"C:\Users\Public\Documents")
+    path = destination.joinpath(sourse)
     if not path.exists():
-        path = shutil.move(
-            src,
-            dst,
-        )
+        path = shutil.copy(sourse, destination)
 
     return path
 
 
 path = get_path()
-print(path)
+
 
 try:
     with open(path, "rb") as f:

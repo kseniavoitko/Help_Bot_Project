@@ -20,12 +20,12 @@ import shutil
 
 
 def load_ab() -> AddressBook:
-    dest = Path(r"C:\Users\Public\Documents")
-    src = Path("address_book.dat")
-    path = dest.joinpath(src)
+    destination = Path(r"C:\Users\Public\Documents")
+    sourse = Path("address_book.dat")
+    path = destination.joinpath(sourse)
 
     if not path.exists():
-        path = shutil.copy(src, dest)
+        path = shutil.copy(sourse, destination)
 
     return path
 
