@@ -1,1 +1,2 @@
 rich==13.5.2
+prompt-toolkit==3.0.39
