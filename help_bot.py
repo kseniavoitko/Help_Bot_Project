@@ -16,14 +16,16 @@ from rich.console import Console
 from rich.table import Table
 from prompt_toolkit.styles import Style
 from pathlib import Path
-import shutil
+import socket, shutil
 
 
 def load_ab() -> AddressBook:
-    destination = Path.home()
+    hostname = socket.gethostname()
+    destination = Path(f"C:\\Users\\{hostname}\\Documents")
     sourse = Path("address_book.dat")
     path = destination.joinpath(sourse)
-    open(path, 'a').close()
+    if not path.exists():
+        path.touch()
 
     return path
 
@@ -155,7 +157,7 @@ def add_birthday(args):
 @save_to_file
 def add_address(args):
     name = Name(args[0])
-    address_str = ''.join(x for x in args[1:])
+    address_str = "".join(x for x in args[1:])
     address = Address(address_str)
     rec: Record = address_book.get(str(name))
     if rec:
@@ -186,7 +188,11 @@ def search(args):
         return f"Contacts not found"
     for rec in records:
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
+            str(rec.name),
+            str(rec.birthday),
+            ", ".join(str(p) for p in rec.phones),
+            str(rec.email),
+            str(rec.address),
         )
 
     console = Console()
@@ -204,11 +210,11 @@ def show_all(args):
     records = address_book.values()
     if not records:
         return f"No contacts"
-    for rec in records:   
+    for rec in records:
         if not count:
             page += 1
             print(f"page {page}")
-            reset_table()    
+            reset_table()
         if count == count_of_records:
             console = Console()
             console.print(table)
@@ -218,11 +224,15 @@ def show_all(args):
             count = 0
         count += 1
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
-        ) 
-        
+            str(rec.name),
+            str(rec.birthday),
+            ", ".join(str(p) for p in rec.phones),
+            str(rec.email),
+            str(rec.address),
+        )
+
     console = Console()
-    console.print(table)     
+    console.print(table)
 
     return ""
 
@@ -237,7 +247,11 @@ def birthdays(args):
         return f"No birthdays in the next {days} days"
     for rec in birthdays_list:
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
+            str(rec.name),
+            str(rec.birthday),
+            ", ".join(str(p) for p in rec.phones),
+            str(rec.email),
+            str(rec.address),
         )
 
     console = Console()
@@ -251,19 +265,19 @@ def no_command(args):
 
 
 COMMANDS = {
-    'hello': hello,
-    'add_phone' : add_phone,
-    'add_email' : add_email,
-    'add_birthday': add_birthday,
-    'add_address' : add_address,
-    'add': add,
-    'change': change,
-    'search': search,
-    'show all': show_all,
-    'birthdays': birthdays,
-    'good bye': exit,
-    'close': exit,
-    'exit': exit
+    "hello": hello,
+    "add_phone": add_phone,
+    "add_email": add_email,
+    "add_birthday": add_birthday,
+    "add_address": add_address,
+    "add": add,
+    "change": change,
+    "search": search,
+    "show all": show_all,
+    "birthdays": birthdays,
+    "good bye": exit,
+    "close": exit,
+    "exit": exit,
 }
 
 
