@@ -114,9 +114,7 @@ class Record():
         return "Contact remove"
 
     def __str__(self) -> str:
-        return "|{:<30}|{:^12}|{:>40}|".format(
-            str(self.name), str(self.birthday), ", ".join(str(p) for p in self.phones)
-        )
+        return f"{str(self.name)}"
 
     def __repr__(self) -> str:
         return str(self)
@@ -140,17 +138,18 @@ class AddressBook(UserDict):
         return self[key]
 
     def search_record(self, key):
-        header = "|{:<30}|{:^12}|{:>40}|".format("Name", "Birthday", "Phones") + "\n"
-        result = ""
+        result = []
+        key = key.lower()
         for rec in self.values():
-            if key.isdigit():
-                found_phones = [str(p) for p in rec.phones if key in str(p)]
-                if len(found_phones) > 0:
-                    result += str(rec) + "\n"
-            elif key.lower() in str(rec.name).lower():
-                result += str(rec) + "\n"
-        if result:
-            yield header + result
+            found_phones = [str(p) for p in rec.phones if key in str(p)]
+            if len(found_phones) > 0:
+                result.append(rec)
+            if key in str(rec.name).lower() \
+                or key in str(rec.address).lower() \
+                or key in str(rec.email).lower() \
+                or key in str(rec.birthday).lower():
+                result.append(rec)  
+        return result
 
     def birthdays(self, days: int):
         current_datetime = datetime.now()
