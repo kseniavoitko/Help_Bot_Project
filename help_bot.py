@@ -35,6 +35,8 @@ def reset_table():
     table.add_column("Name", justify="right", style="cyan", no_wrap=True)
     table.add_column("Birthday", style="magenta")
     table.add_column("Phones", justify="right", style="green")
+    table.add_column("E-mail", justify="right", style="green")
+    table.add_column("Address", justify="right", style="green")
 
 
 def save_to_file(func):
@@ -141,7 +143,7 @@ def add_birthday(args):
 @save_to_file
 def add_address(args):
     name = Name(args[0])
-    address_str = str(x for x in args[1:])
+    address_str = ''.join(x for x in args[1:])
     address = Address(address_str)
     rec: Record = address_book.get(str(name))
     if rec:
@@ -165,26 +167,52 @@ def change(args):
 
 @input_error
 @read_from_file
-def phone(args):
-    result = "No contacts"
-    for rec in address_book.search_record(args[0]):
-        print(rec)
-        result = ""
-    return result
+def search(args):
+    reset_table()
+    records = address_book.search_record(args[0])
+    if not records:
+        return f"Contacts not found"
+    for rec in records:
+        table.add_row(
+            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
+        )
+
+    console = Console()
+    console.print(table)
+
+    return ""
 
 
 @input_error
 @read_from_file
 def show_all(args):
     page = 0
-    result = "No contacts"
-    for rec in address_book.iterator(int(args[0]) if len(args) else 5):
-        page += 1
-        print(f"page {page}")
-        print(rec)
-        result = "END"
+    count = 0
+    count_of_records = int(args[0]) if len(args) else 5
+    records = address_book.values()
+    if not records:
+        return f"No contacts"
+    for rec in records:   
+        if not count:
+            page += 1
+            print(f"page {page}")
+            reset_table()    
+        if count == count_of_records:
+            console = Console()
+            console.print(table)
+            page += 1
+            print(f"page {page}")
+            reset_table()
+            count = 0
+        count += 1
+        table.add_row(
+            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
+        ) 
+        
+    console = Console()
+    console.print(table)     
 
-    return result
+    return ""
 
 
 @read_from_file
@@ -197,7 +225,7 @@ def birthdays(args):
         return f"No birthdays in the next {days} days"
     for rec in birthdays_list:
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones)
+            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
         )
 
     console = Console()
@@ -218,7 +246,7 @@ COMMANDS = {
     'add_address' : add_address,
     'add': add,
     'change': change,
-    'phone': phone,
+    'search': search,
     'show all': show_all,
     'birthdays': birthdays,
     'good bye': exit,
