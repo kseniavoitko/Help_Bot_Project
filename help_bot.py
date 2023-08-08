@@ -15,9 +15,23 @@ from prompt_toolkit.completion import WordCompleter
 from rich.console import Console
 from rich.table import Table
 from prompt_toolkit.styles import Style
+from pathlib import Path
+import shutil
 
 
-address_book = AddressBook("address_book.dat")
+def load_ab() -> AddressBook:
+    dest = Path(r"C:\Users\Public\Documents")
+    src = Path("address_book.dat")
+    path = dest.joinpath(src)
+
+    if not path.exists():
+        path = shutil.copy(src, dest)
+
+    return path
+
+
+address_book = AddressBook(load_ab())
+
 try:
     address_book.read_from_file()
 except:
@@ -82,9 +96,9 @@ def input_error(func):
         except PhoneError:
             return "Phone must contain 10 digits and starts with 0 or 12 digits and starts with 380"
         except BirthdayError:
-            return 'Birthday format is dd.mm.yyyy'
+            return "Birthday format is dd.mm.yyyy"
         except EmailError:
-            return 'Please enter your email correctly'
+            return "Please enter your email correctly"
 
     return inner
 
@@ -103,7 +117,7 @@ def add(args):
 
 @input_error
 @save_to_file
-def add_phone(args):   
+def add_phone(args):
     name = Name(args[0])
     phone = Phone(args[1])
     rec: Record = address_book.get(str(name))
@@ -211,19 +225,19 @@ def no_command(args):
 
 
 COMMANDS = {
-    'hello': hello,
-    'add_phone' : add_phone,
-    'add_email' : add_email,
-    'add_birthday': add_birthday,
-    'add_address' : add_address,
-    'add': add,
-    'change': change,
-    'phone': phone,
-    'show all': show_all,
-    'birthdays': birthdays,
-    'good bye': exit,
-    'close': exit,
-    'exit': exit
+    "hello": hello,
+    "add_phone": add_phone,
+    "add_email": add_email,
+    "add_birthday": add_birthday,
+    "add_address": add_address,
+    "add": add,
+    "change": change,
+    "phone": phone,
+    "show all": show_all,
+    "birthdays": birthdays,
+    "good bye": exit,
+    "close": exit,
+    "exit": exit,
 }
 
 
