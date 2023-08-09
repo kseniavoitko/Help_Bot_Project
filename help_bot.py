@@ -271,33 +271,60 @@ def no_command(args):
 
 
 COMMANDS = {
-    "add": add,
-    "add_address": add_address,
-    "add_birthday": add_birthday,
-    "add_email": add_email,
-    "add_phone": add_phone,
-    "birthdays": birthdays,
-    "change": change,
-    "close": exit,
-    "del contact": del_contact,
-    "exit": exit,
-    "good bye": exit,
-    "hello": hello,
-    "search": search,
-    "show all": show_all,
+    ("add",): add,
+    ("add_address", "change_address"): add_address,
+    ("add_birthday",): add_birthday,
+    ("add_email", "change_email"): add_email,
+    ("add_phone",): add_phone,
+    ("birthdays",): birthdays,
+    ("change_phone",): change,
+    ("close",): exit,
+    ("del_contact",): del_contact,
+    ("exit",): exit,
+    ("good_bye",): exit,
+    ("hello",): hello,
+    ("search",): search,
+    ("show_all",): show_all,
 }
 
 
+def get_list_for_prediction():
+    name_for_pred = [name for name in address_book.keys()]
+    email_for_pred = [
+        str(mails.email)
+        for mails in address_book.values()
+        if str(mails.email) != "None"
+    ]
+    address_for_pred = [
+        str(rec.address) for rec in address_book.values() if rec.address
+    ]
+    list_for_predict = [command for commands in COMMANDS.keys() for command in commands]
+    list_for_predict.extend(name_for_pred)
+    list_for_predict.extend(email_for_pred)
+    list_for_predict.extend(address_for_pred)
+    list_for_predict = WordCompleter(list_for_predict)
+    return list_for_predict
+
+
+def style_for_input():
+    style = Style.from_dict({"": "ansicyan underline"})
+    return style
+
+
 def parser(text: str) -> tuple[callable, list[str]]:
-    for key in COMMANDS:
-        if text.lower().startswith(key):
-            return COMMANDS[key], text.replace(key, "").strip().split()
+    text = text.lower().strip().split()
+    for comm, func in COMMANDS.items():
+        if text[0] in comm:
+            text = text[1:]
+            return func, text
     return no_command, ""
 
 
 def main():
     while True:
-        user_input = prompt(">>> ", completer=list_for_predict, style=style)
+        user_input = prompt(
+            ">>> ", completer=get_list_for_prediction(), style=style_for_input()
+        )
         command, data = parser(user_input)
         if command == exit:
             print("Buy!")
@@ -307,6 +334,4 @@ def main():
 
 
 if __name__ == "__main__":
-    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
-    style = Style.from_dict({"": "ansicyan underline"})
     main()
