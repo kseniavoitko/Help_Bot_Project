@@ -42,6 +42,7 @@ class Phone(Field):
             len(new_value) == 12 and new_value.startswith("380")
         ):
             self.__value = new_value
+
         else:
             raise PhoneError
 
