@@ -271,7 +271,23 @@ def no_command(args):
     return "Unknown command"
 
 
-
+COMMANDS = {
+    "add": add,
+    "add_address": add_address,
+    "add_birthday": add_birthday,
+    "add_email": add_email,
+    "add_phone": add_phone,
+    "birthdays": birthdays,
+    "change": change,
+    "close": exit,
+    "del contact": del_contact,
+    "exit": exit,
+    "good bye": exit,
+    "hello": hello,
+    "search": search,
+    "show all": show_all,
+    "switcher": switcher,
+}
 
 
 def parser(text: str) -> tuple[callable, list[str]]:
