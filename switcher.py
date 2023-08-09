@@ -6,7 +6,7 @@ def switcher(*args):
     print("Print switch [mode] to choose your mode:\n [1]: contacts \n [2]: notes \n [3]: sorter")
 
     while True:
-        mode = (input('>>> '))
+        mode = input('>>> ')
         if mode == "1" or mode == "contacts":
             print("Contact mode enabled")
             contacts_mode()
