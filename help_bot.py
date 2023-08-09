@@ -130,6 +130,16 @@ def add_phone(args):
 
 @input_error
 @save_to_file
+def del_contact(args: str) -> str:
+    name = Name(args[0])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return address_book.del_record(rec)
+    return f"No contact {name} in address book"
+
+
+@input_error
+@save_to_file
 def add_email(args):
     name = Name(args[0])
     email = Email(args[1])
@@ -156,7 +166,7 @@ def add_birthday(args):
 @save_to_file
 def add_address(args):
     name = Name(args[0])
-    address_str = "".join(x for x in args[1:])
+    address_str = " ".join(x for x in args[1:])
     address = Address(address_str)
     rec: Record = address_book.get(str(name))
     if rec:
@@ -274,39 +284,57 @@ def no_command(args):
 
 
 COMMANDS = {
-    "hello": hello,
-    "add_phone": add_phone,
-    "add_email": add_email,
-    "add_birthday": add_birthday,
-    "add_address": add_address,
-    "add": add,
-    "change": change,
-    "del contact": del_contact,
-    "search": search,
-    "show all": show_all,
-    "birthdays": birthdays,
-    "good bye": exit,
-    "close": exit,
-    "exit": exit,
-    "switcher": switcher,
-
+    ("add",): add,
+    ("add_address", "change_address"): add_address,
+    ("add_birthday",): add_birthday,
+    ("add_email", "change_email"): add_email,
+    ("add_phone",): add_phone,
+    ("birthdays",): birthdays,
+    ("change_phone",): change,
+    ("close",): exit,
+    ("del_contact",): del_contact,
+    ("exit",): exit,
+    ("good_bye",): exit,
+    ("hello",): hello,
+    ("search",): search,
+    ("show_all",): show_all,
+    ("switcher",): switcher,
 }
 
 
-def get_list_predict() -> list:
-    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
+def get_list_for_prediction():
+    name_for_pred = [name for name in address_book.keys()]
+    email_for_pred = [
+        str(mails.email)
+        for mails in address_book.values()
+        if str(mails.email) != "None"
+    ]
+    address_for_pred = [
+        str(rec.address) for rec in address_book.values() if rec.address
+    ]
+    phone_for_pred = [str(rec.phones)
+                      for rec in address_book.values()if rec.phones]
+    phones = [phone[1:-1] for phone in phone_for_pred]
+    list_for_predict = [command for commands in COMMANDS.keys() for command in commands]
+    list_for_predict.extend(name_for_pred)
+    list_for_predict.extend(email_for_pred)
+    list_for_predict.extend(address_for_pred)
+    list_for_predict.extend(phones)
+    list_for_predict = WordCompleter(list_for_predict)
     return list_for_predict
 
 
-def get_style():
+def style_for_input():
     style = Style.from_dict({"": "ansicyan underline"})
     return style
 
 
 def parser(text: str) -> tuple[callable, list[str]]:
-    for key in COMMANDS:
-        if text.lower().startswith(key):
-            return COMMANDS[key], text.replace(key, "").strip().split()
+    text = text.strip().split()
+    for comm, func in COMMANDS.items():
+        if text[0].lower() in comm:
+            text = text[1:]
+            return func, text
     return no_command, ""
 
 
@@ -314,7 +342,9 @@ def main():
     list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
     style = Style.from_dict({"": "ansicyan underline"})
     while True:
-        user_input = prompt(">>> ", completer=get_list_predict(), style=get_style())
+        user_input = prompt(
+            ">>> ", completer=get_list_for_prediction(), style=style_for_input()
+        )
         command, data = parser(user_input)
         if command == exit:
             print("Buy!")
