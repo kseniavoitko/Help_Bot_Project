@@ -10,15 +10,18 @@ def switcher(*args):
         if mode == 1:
             print("Contact mode enabled")
             contacts_mode()
+            break
         elif mode == 2:
             print("Notes mode enabled")
             note_mode()
+            break
         elif mode == 3:
             print("Sorter mode enabled")
             sorter_mode()
+            break
         else:
             print("Invalid mode argument")
-            
+
             
 if __name__ == "__main__":
     switcher()
