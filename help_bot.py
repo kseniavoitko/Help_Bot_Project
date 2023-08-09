@@ -16,6 +16,7 @@ from rich.console import Console
 from rich.table import Table
 from prompt_toolkit.styles import Style
 from pathlib import Path
+import shutil
 
 
 def load_ab() -> AddressBook:
@@ -126,15 +127,6 @@ def add_phone(args):
     return address_book.add_record(rec)
 
 
-@save_to_file
-def del_contact(args: str) -> str:
-    name = Name(args[0])
-    rec: Record = address_book.get(str(name))
-    if rec:
-        return address_book.del_record(rec)
-    return f"No contact {name} in address book"
-
-
 @input_error
 @save_to_file
 def add_email(args):
@@ -170,6 +162,16 @@ def add_address(args):
         return rec.add_address(address)
     rec = Record(name, address)
     return address_book.add_record(rec)
+
+
+@input_error
+@save_to_file
+def del_contact(args: str) -> str:
+    name = Name(args[0])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return address_book.del_record(rec)
+    return f"No contact {name} in address book"
 
 
 @input_error
@@ -271,21 +273,31 @@ def no_command(args):
 
 
 COMMANDS = {
-    "add": add,
-    "add_address": add_address,
-    "add_birthday": add_birthday,
-    "add_email": add_email,
-    "add_phone": add_phone,
-    "birthdays": birthdays,
-    "change": change,
-    "close": exit,
-    "del contact": del_contact,
-    "exit": exit,
-    "good bye": exit,
     "hello": hello,
+    "add_phone": add_phone,
+    "add_email": add_email,
+    "add_birthday": add_birthday,
+    "add_address": add_address,
+    "add": add,
+    "change": change,
+    "del contact": del_contact,
     "search": search,
     "show all": show_all,
+    "birthdays": birthdays,
+    "good bye": exit,
+    "close": exit,
+    "exit": exit,
 }
+
+
+def get_list_predict() -> list:
+    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
+    return list_for_predict
+
+
+def get_style():
+    style = Style.from_dict({"": "ansicyan underline"})
+    return style
 
 
 def parser(text: str) -> tuple[callable, list[str]]:
@@ -297,7 +309,7 @@ def parser(text: str) -> tuple[callable, list[str]]:
 
 def main():
     while True:
-        user_input = prompt(">>> ", completer=list_for_predict, style=style)
+        user_input = prompt(">>> ", completer=get_list_predict(), style=get_style())
         command, data = parser(user_input)
         if command == exit:
             print("Buy!")
@@ -307,6 +319,4 @@ def main():
 
 
 if __name__ == "__main__":
-    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
-    style = Style.from_dict({"": "ansicyan underline"})
     main()
