@@ -285,7 +285,7 @@ def main():
 
 
     while True:
-        user_input = input(">>>")
+        user_input = prompt(">>> ", completer=create_predict())
         cmd, data = parser(user_input)
         result = cmd(*data)
         print(f"\033[36m{result}\033[0m")
