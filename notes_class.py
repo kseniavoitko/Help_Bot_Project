@@ -111,7 +111,9 @@ class Record:
 class Notepad(UserDict):
     def save_to_file(self):
         hostname = socket.gethostname()
-        path = Path(f"C:\\Users\\{hostname}\\Documents\\notes.bin")
+        sourse = Path("notes.bin")
+        destination = Path(f"C:\\Users\\{hostname}\\Documents")
+        path = destination.joinpath(sourse)
         with open(path, "wb") as f:
             pickle.dump(self, f)
 
