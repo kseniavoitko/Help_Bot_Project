@@ -142,10 +142,6 @@ class AddressBook(UserDict):
         self.data[str(record.name)] = record
         return f"Contact {record} add success"
 
-    def del_record(self, record: Record) -> str:
-        del_rec = self.pop(str(record.name))
-        return f"contact {del_rec} has been deleted"
-
     def show_all_records(self):
         if not len(self):
             return "No contacts"
@@ -199,6 +195,10 @@ class AddressBook(UserDict):
                 result = header
         if result:
             yield result
+
+    def del_record(self, record: Record) -> str:
+        del_rec = self.pop(str(record.name))
+        return f"contact {del_rec} has been deleted"
 
     def save_to_file(self):
         with open(self.filename, "wb") as file:

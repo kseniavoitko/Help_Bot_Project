@@ -1,4 +1,4 @@
-import sys
+from switcher import switcher
 from pathlib import Path
 import uuid
 import shutil
@@ -89,21 +89,21 @@ def unpack_archive(path: Path) -> None:
 
 
 def main():
+    while True:
+        command = input('Type "sort route/to/directory" or "switcher" to switch mode\n>>> ')
+        if command == "switcher":
+            switcher()
+        
+        path = Path(command)
 
-    try:
-        command = input("Type 'sort route/to/directory':")
-        path = Path(command.split(" ")[1])
+        if not path.exists():
+            print(f'{path} not exist!')
+            continue
 
-    except IndexError:
-        print("Must be 1 argument!")
-        return
-    
-    if not path.exists():
-        print(f'{path} not exist!')
-
-    sort_folder(path) 
-    unpack_archive(path.joinpath('archives'))
-    delete_empty_folder(path)
+        sort_folder(path)
+        unpack_archive(path.joinpath('archives'))
+        delete_empty_folder(path)
+        break
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+from switcher import switcher
 from help_bot_classes import (
     AddressBook,
     Name,
@@ -16,6 +17,7 @@ from rich.console import Console
 from rich.table import Table
 from prompt_toolkit.styles import Style
 from pathlib import Path
+import shutil
 
 
 def load_ab() -> AddressBook:
@@ -175,6 +177,16 @@ def add_address(args):
 
 @input_error
 @save_to_file
+def del_contact(args: str) -> str:
+    name = Name(args[0])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return address_book.del_record(rec)
+    return f"No contact {name} in address book"
+
+
+@input_error
+@save_to_file
 def change(args):
     """Get 2 phones to change
     or 1 phone to remove"""
@@ -286,6 +298,7 @@ COMMANDS = {
     ("hello",): hello,
     ("search",): search,
     ("show_all",): show_all,
+    ("switcher",): switcher,
 }
 
 
@@ -326,6 +339,8 @@ def parser(text: str) -> tuple[callable, list[str]]:
 
 
 def main():
+    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
+    style = Style.from_dict({"": "ansicyan underline"})
     while True:
         user_input = prompt(
             ">>> ", completer=get_list_for_prediction(), style=style_for_input()
