@@ -90,9 +90,11 @@ def unpack_archive(path: Path) -> None:
 
 def main():
     while True:
-        command = input('Type "sort route/to/directory" or "switcher" to switch mode\n>>> ')
+        command = input('Type "sort path/to/directory" (leave blank to sort current directory) or "switcher" to switch mode\n>>> ')
         if command == "switcher":
             switcher()
+        if command == "exit":
+            break
         
         path = Path(command)
 
