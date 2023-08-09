@@ -164,7 +164,7 @@ def add_birthday(args):
 @save_to_file
 def add_address(args):
     name = Name(args[0])
-    address_str = "".join(x for x in args[1:])
+    address_str = " ".join(x for x in args[1:])
     address = Address(address_str)
     rec: Record = address_book.get(str(name))
     if rec:
@@ -299,10 +299,14 @@ def get_list_for_prediction():
     address_for_pred = [
         str(rec.address) for rec in address_book.values() if rec.address
     ]
+    phone_for_pred = [str(rec.phones)
+                      for rec in address_book.values()if rec.phones]
+    phones = [phone[1:-1] for phone in phone_for_pred]
     list_for_predict = [command for commands in COMMANDS.keys() for command in commands]
     list_for_predict.extend(name_for_pred)
     list_for_predict.extend(email_for_pred)
     list_for_predict.extend(address_for_pred)
+    list_for_predict.extend(phones)
     list_for_predict = WordCompleter(list_for_predict)
     return list_for_predict
 
@@ -313,9 +317,9 @@ def style_for_input():
 
 
 def parser(text: str) -> tuple[callable, list[str]]:
-    text = text.lower().strip().split()
+    text = text.strip().split()
     for comm, func in COMMANDS.items():
-        if text[0] in comm:
+        if text[0].lower() in comm:
             text = text[1:]
             return func, text
     return no_command, ""
