@@ -10,8 +10,10 @@ class PhoneError(Exception):
 class BirthdayError(Exception):
     pass
 
+
 class EmailError(Exception):
     pass
+
 
 class Field:
     def __init__(self, value) -> None:
@@ -57,26 +59,36 @@ class Birthday(Field):
             raise BirthdayError
 
     def __str__(self) -> str:
-        return self.value.strftime('%d.%m.%Y')
-    
+        return self.value.strftime("%d.%m.%Y")
+
+
 class Email(Field):
     @property
     def value(self):
         return self.__value
-    
+
     @value.setter
     def value(self, new_value):
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if re.match(pattern, new_value):
             self.__value = new_value
         else:
             raise EmailError
-        
+
+
 class Address(Field):
     ...
 
-class Record():
-    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None, address: Address = None) -> None:
+
+class Record:
+    def __init__(
+        self,
+        name: Name,
+        phone: Phone = None,
+        birthday: Birthday = None,
+        email: Email = None,
+        address: Address = None,
+    ) -> None:
         self.name = name
         self.birthday = birthday
         self.phones = []
@@ -84,25 +96,25 @@ class Record():
             self.phones.append(phone)
         self.email = email
         self.address = address
-   
+
     def add_phone(self, phone: Phone):
         if phone.value not in [p.value for p in self.phones]:
             self.phones.append(phone)
             return f"phone {phone} add to contact {self.name}"
         return f"{phone} present in phones of contact {self.name}"
-    
+
     def add_email(self, email: Email):
         self.email = email
         return "The email has been changed"
-    
+
     def add_birthday(self, birthday: Birthday):
         self.birthday = birthday
         return "The birthday has been changed"
-    
+
     def add_address(self, address: Address):
         self.address = address
         return "The adrress has been changed"
-    
+
     def change_phone(self, old, new):
         old_ind = [i.value for i in self.phones].index(old)
         self.phones[old_ind] = new
@@ -144,11 +156,13 @@ class AddressBook(UserDict):
             found_phones = [str(p) for p in rec.phones if key in str(p)]
             if len(found_phones) > 0:
                 result.append(rec)
-            if key in str(rec.name).lower() \
-                or key in str(rec.address).lower() \
-                or key in str(rec.email).lower() \
-                or key in str(rec.birthday).lower():
-                result.append(rec)  
+            if (
+                key in str(rec.name).lower()
+                or key in str(rec.address).lower()
+                or key in str(rec.email).lower()
+                or key in str(rec.birthday).lower()
+            ):
+                result.append(rec)
         return result
 
     def birthdays(self, days: int):
@@ -180,6 +194,10 @@ class AddressBook(UserDict):
                 result = header
         if result:
             yield result
+
+    def del_record(self, record: Record) -> str:
+        del_rec = self.pop(str(record.name))
+        return f"contact {del_rec} has been deleted"
 
     def save_to_file(self):
         with open(self.filename, "wb") as file:

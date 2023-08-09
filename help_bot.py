@@ -23,7 +23,7 @@ def load_ab() -> AddressBook:
     destination = Path.home()
     sourse = Path("address_book.dat")
     path = destination.joinpath(sourse)
-    open(path, 'a').close()
+    open(path, "a").close()
 
     return path
 
@@ -155,13 +155,22 @@ def add_birthday(args):
 @save_to_file
 def add_address(args):
     name = Name(args[0])
-    address_str = ''.join(x for x in args[1:])
+    address_str = "".join(x for x in args[1:])
     address = Address(address_str)
     rec: Record = address_book.get(str(name))
     if rec:
         return rec.add_address(address)
     rec = Record(name, address)
     return address_book.add_record(rec)
+
+
+@save_to_file
+def del_contact(args: str) -> str:
+    name = Name(args[0])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return address_book.del_record(rec)
+    return f"No contact {name} in address book"
 
 
 @input_error
@@ -186,7 +195,11 @@ def search(args):
         return f"Contacts not found"
     for rec in records:
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
+            str(rec.name),
+            str(rec.birthday),
+            ", ".join(str(p) for p in rec.phones),
+            str(rec.email),
+            str(rec.address),
         )
 
     console = Console()
@@ -204,11 +217,11 @@ def show_all(args):
     records = address_book.values()
     if not records:
         return f"No contacts"
-    for rec in records:   
+    for rec in records:
         if not count:
             page += 1
             print(f"page {page}")
-            reset_table()    
+            reset_table()
         if count == count_of_records:
             console = Console()
             console.print(table)
@@ -218,11 +231,15 @@ def show_all(args):
             count = 0
         count += 1
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
-        ) 
-        
+            str(rec.name),
+            str(rec.birthday),
+            ", ".join(str(p) for p in rec.phones),
+            str(rec.email),
+            str(rec.address),
+        )
+
     console = Console()
-    console.print(table)     
+    console.print(table)
 
     return ""
 
@@ -237,7 +254,11 @@ def birthdays(args):
         return f"No birthdays in the next {days} days"
     for rec in birthdays_list:
         table.add_row(
-            str(rec.name), str(rec.birthday), ", ".join(str(p) for p in rec.phones), str(rec.email), str(rec.address)
+            str(rec.name),
+            str(rec.birthday),
+            ", ".join(str(p) for p in rec.phones),
+            str(rec.email),
+            str(rec.address),
         )
 
     console = Console()
@@ -251,20 +272,31 @@ def no_command(args):
 
 
 COMMANDS = {
-    'hello': hello,
-    'add_phone' : add_phone,
-    'add_email' : add_email,
-    'add_birthday': add_birthday,
-    'add_address' : add_address,
-    'add': add,
-    'change': change,
-    'search': search,
-    'show all': show_all,
-    'birthdays': birthdays,
-    'good bye': exit,
-    'close': exit,
-    'exit': exit
+    "hello": hello,
+    "add_phone": add_phone,
+    "add_email": add_email,
+    "add_birthday": add_birthday,
+    "add_address": add_address,
+    "add": add,
+    "change": change,
+    "del contact": del_contact,
+    "search": search,
+    "show all": show_all,
+    "birthdays": birthdays,
+    "good bye": exit,
+    "close": exit,
+    "exit": exit,
 }
+
+
+def get_list_predict() -> list:
+    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
+    return list_for_predict
+
+
+def get_style():
+    style = Style.from_dict({"": "ansicyan underline"})
+    return style
 
 
 def parser(text: str) -> tuple[callable, list[str]]:
@@ -276,7 +308,7 @@ def parser(text: str) -> tuple[callable, list[str]]:
 
 def main():
     while True:
-        user_input = prompt(">>> ", completer=list_for_predict, style=style)
+        user_input = prompt(">>> ", completer=get_list_predict(), style=get_style())
         command, data = parser(user_input)
         if command == exit:
             print("Buy!")
@@ -286,6 +318,4 @@ def main():
 
 
 if __name__ == "__main__":
-    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
-    style = Style.from_dict({"": "ansicyan underline"})
     main()
