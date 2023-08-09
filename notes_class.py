@@ -1,6 +1,7 @@
 import pickle
 from collections import UserDict
 from datetime import datetime
+from pathlib import Path
 
 
 class DeadlineError(Exception):
@@ -111,7 +112,11 @@ class Record:
  
 class Notepad(UserDict):
     def save_to_file(self):
-        with open("notes.bin", "wb") as f:
+        sourse = Path("notes.bin")
+        destination = Path.home()
+        path = destination.joinpath(sourse)
+        open(path, 'a').close()
+        with open(path, "wb") as f:
             pickle.dump(self, f)
 
     def get_number(self):

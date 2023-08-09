@@ -1,10 +1,35 @@
-from notes_class import Notepad, Deadline, Title, Description, Tags, Record, DeadlineError
+from switcher import switcher
+from notes_class import (
+    Notepad,
+    Deadline,
+    Title,
+    Description,
+    Tags,
+    Record,
+    DeadlineError,
+)
 from datetime import datetime
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 import pickle
+from pathlib import Path
+import shutil
 
 notepad = Notepad()
+
+def get_path() -> Path:
+    sourse = Path("notes.bin")
+    destination = Path.home()
+    path = destination.joinpath(sourse)
+    open(path, 'a').close()
+
+    return path
+
+
+path = get_path()
+
 try:
-    with open("notes.bin", "rb") as f:
+    with open(path, "rb") as f:
         try:
             notepad = pickle.load(f) 
         except EOFError:
@@ -208,6 +233,9 @@ def unknown_command(*args):
 def hello_command(*args):
     return "How can I help you?>>>"
 
+def switcher_command(*args):
+    switcher()
+
 
 COMMANDS = {
             add_command: ("add", ),
@@ -224,8 +252,23 @@ COMMANDS = {
             search_str_command: ("search", "find"),
             tag_command: ("tag", "tags"),
             help_command: ("help", "help"),
-            exit_command: ("exit", "close", "bye", "good bye", "stop")
+            exit_command: ("exit", "close", "bye", "good bye", "stop"),
+            switcher_command: ("switcher")
             }
+
+
+def create_predict() -> None:
+    list_for_predict = []
+    for values in COMMANDS.values():
+        if values == 1:
+            list_for_predict.append(values)
+        else:
+            for value in values:
+                list_for_predict.append(value)
+
+    list_for_predict = WordCompleter(list_for_predict)
+
+    return list_for_predict
 
 
 def parser(text:str):
