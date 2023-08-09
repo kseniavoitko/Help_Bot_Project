@@ -17,6 +17,7 @@ from rich.console import Console
 from rich.table import Table
 from prompt_toolkit.styles import Style
 from pathlib import Path
+import shutil
 
 
 def load_ab() -> AddressBook:
@@ -127,15 +128,6 @@ def add_phone(args):
     return address_book.add_record(rec)
 
 
-@save_to_file
-def del_contact(args: str) -> str:
-    name = Name(args[0])
-    rec: Record = address_book.get(str(name))
-    if rec:
-        return address_book.del_record(rec)
-    return f"No contact {name} in address book"
-
-
 @input_error
 @save_to_file
 def add_email(args):
@@ -171,6 +163,16 @@ def add_address(args):
         return rec.add_address(address)
     rec = Record(name, address)
     return address_book.add_record(rec)
+
+
+@input_error
+@save_to_file
+def del_contact(args: str) -> str:
+    name = Name(args[0])
+    rec: Record = address_book.get(str(name))
+    if rec:
+        return address_book.del_record(rec)
+    return f"No contact {name} in address book"
 
 
 @input_error
@@ -287,7 +289,18 @@ COMMANDS = {
     "close": exit,
     "exit": exit,
     "switcher": switcher,
+
 }
+
+
+def get_list_predict() -> list:
+    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
+    return list_for_predict
+
+
+def get_style():
+    style = Style.from_dict({"": "ansicyan underline"})
+    return style
 
 
 def parser(text: str) -> tuple[callable, list[str]]:
@@ -301,7 +314,7 @@ def main():
     list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
     style = Style.from_dict({"": "ansicyan underline"})
     while True:
-        user_input = prompt(">>> ", completer=list_for_predict, style=style)
+        user_input = prompt(">>> ", completer=get_list_predict(), style=get_style())
         command, data = parser(user_input)
         if command == exit:
             print("Buy!")
