@@ -126,6 +126,7 @@ def add_phone(args):
     return address_book.add_record(rec)
 
 
+@input_error
 @save_to_file
 def del_contact(args: str) -> str:
     name = Name(args[0])
