@@ -272,20 +272,20 @@ def no_command(args):
 
 
 COMMANDS = {
-    "add": add,
-    "add_address": add_address,
-    "add_birthday": add_birthday,
-    "add_email": add_email,
-    "add_phone": add_phone,
-    "birthdays": birthdays,
-    "change": change,
-    "close": exit,
-    "del contact": del_contact,
-    "exit": exit,
-    "good bye": exit,
     "hello": hello,
+    "add_phone": add_phone,
+    "add_email": add_email,
+    "add_birthday": add_birthday,
+    "add_address": add_address,
+    "add": add,
+    "change": change,
+    "del contact": del_contact,
     "search": search,
     "show all": show_all,
+    "birthdays": birthdays,
+    "good bye": exit,
+    "close": exit,
+    "exit": exit,
     "switcher": switcher,
 }
 
