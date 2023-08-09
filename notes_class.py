@@ -1,4 +1,4 @@
-import pickle
+import pickle, socket
 from collections import UserDict
 from datetime import datetime
 from pathlib import Path
@@ -110,7 +110,8 @@ class Record:
 
 class Notepad(UserDict):
     def save_to_file(self):
-        path = Path(r"C:\Users\Public\Documents\notes.bin")
+        hostname = socket.gethostname()
+        path = Path(f"C:\\Users\\{hostname}\\Documents\\notes.bin")
         with open(path, "wb") as f:
             pickle.dump(self, f)
 

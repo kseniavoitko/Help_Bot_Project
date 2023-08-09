@@ -16,16 +16,14 @@ from rich.console import Console
 from rich.table import Table
 from prompt_toolkit.styles import Style
 from pathlib import Path
-import socket, shutil
+import shutil
 
 
 def load_ab() -> AddressBook:
-    hostname = socket.gethostname()
-    destination = Path(f"C:\\Users\\{hostname}\\Documents")
+    destination = Path.home()
     sourse = Path("address_book.dat")
     path = destination.joinpath(sourse)
-    if not path.exists():
-        path.touch()
+    open(path, "a").close()
 
     return path
 

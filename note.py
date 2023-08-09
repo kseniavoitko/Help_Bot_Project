@@ -10,27 +10,24 @@ from notes_class import (
 from datetime import datetime
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
-import pickle
+import pickle, socket
 from pathlib import Path
-import shutil
+
 
 notepad = Notepad()
 
 
 def get_path() -> Path:
+    hostname = socket.gethostname()
     sourse = Path("notes.bin")
-    destination = Path.home()
+    destination = Path(f"C:\\Users\\{hostname}\\Documents")
     path = destination.joinpath(sourse)
-    open(path, 'a').close()
-
+    open(path, "a").close()
     return path
 
 
-path = get_path()
-
-
 try:
-    with open(path, "rb") as f:
+    with open(get_path(), "rb") as f:
         try:
             notepad = pickle.load(f)
         except EOFError:
