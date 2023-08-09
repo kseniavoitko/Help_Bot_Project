@@ -1,3 +1,4 @@
+from switcher import switcher
 from help_bot_classes import (
     AddressBook,
     Name,
@@ -285,6 +286,7 @@ COMMANDS = {
     "hello": hello,
     "search": search,
     "show all": show_all,
+    "switcher": switcher,
 }
 
 
@@ -296,6 +298,8 @@ def parser(text: str) -> tuple[callable, list[str]]:
 
 
 def main():
+    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
+    style = Style.from_dict({"": "ansicyan underline"})
     while True:
         user_input = prompt(">>> ", completer=list_for_predict, style=style)
         command, data = parser(user_input)
@@ -307,6 +311,4 @@ def main():
 
 
 if __name__ == "__main__":
-    list_for_predict = WordCompleter([command for command in COMMANDS.keys()])
-    style = Style.from_dict({"": "ansicyan underline"})
     main()
