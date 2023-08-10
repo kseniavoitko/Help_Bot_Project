@@ -12,9 +12,9 @@ with open("LICENSE", "r", encoding="utf-8") as license_file:
 setup(
     name='help_bot',
     version='0.1.0',
-    description='A tool to manage contacts and notes',
-    author='Group 4',
-    author_email=['nataliia.manushyna@gmail.com', 'tovkun.andrii@gmail.com', 'mr.sanscrit@gmail.com', 'rolmf85@gmail.com'],
+    description='A simple tool to manage yours contacts and notes. Also you can sort your directories',
+    author='f"{group4_name}',
+    author_email=['kseniavoytko95@gmail.com', 'nataliia.manushyna@gmail.com', 'tovkun.andrii@gmail.com', 'mr.sanscrit@gmail.com', 'rolmf85@gmail.com'],
     packages=find_packages(),
     entry_points={
         'console_scripts': [
