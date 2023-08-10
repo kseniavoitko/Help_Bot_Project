@@ -1,8 +1,8 @@
-def switcher(*args):
+def main(*args):
     import sys
-    from note import main as note_mode
-    from sorter import main as sorter_mode
-    from help_bot import main as contacts_mode
+    from help_bot.note import main as note_mode
+    from help_bot.sorter import main as sorter_mode
+    from help_bot.help_bot import main as contacts_mode
 
     print("Print switch [mode] to choose your mode:\n [1]: contacts \n [2]: notes \n [3]: sorter")
 
@@ -25,4 +25,4 @@ def switcher(*args):
 
             
 if __name__ == "__main__":
-    switcher()
+    main()

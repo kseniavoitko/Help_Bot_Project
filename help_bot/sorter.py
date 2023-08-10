@@ -1,10 +1,10 @@
-from switcher import switcher
+from help_bot.switcher import main as switcher
 from pathlib import Path
 import uuid
 import shutil
 import os
 
-from normalize import normalize
+from help_bot.normalize import normalize
 
 CATEGORIES = {
         'images': ['.JPEG', '.PNG', '.JPG', '.SVG'],
