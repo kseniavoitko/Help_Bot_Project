@@ -4,7 +4,7 @@ def main(*args):
     from help_bot.sorter import main as sorter_mode
     from help_bot.help_bot import main as contacts_mode
 
-    print("Print switch [mode] to choose your mode:\n [1]: contacts \n [2]: notes \n [3]: sorter")
+    print("Print [number] or [name] of mode to choose your one:\n [1]: [contacts] \n [2]: [notes] \n [3]: [sorter]")
 
     while True:
         mode = input('>>> ')
