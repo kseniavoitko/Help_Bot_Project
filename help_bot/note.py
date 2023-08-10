@@ -1,5 +1,5 @@
-from switcher import switcher
-from notes_class import (
+from help_bot.switcher import main as switcher
+from help_bot.notes_class import (
     Notepad,
     Deadline,
     Title,

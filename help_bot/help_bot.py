@@ -1,5 +1,5 @@
-from switcher import switcher
-from help_bot_classes import (
+from help_bot.switcher import main as switcher
+from help_bot.help_bot_classes import (
     AddressBook,
     Name,
     Phone,
