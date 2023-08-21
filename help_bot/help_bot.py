@@ -18,6 +18,15 @@ from rich.table import Table
 from prompt_toolkit.styles import Style
 from pathlib import Path
 import shutil
+from help_bot.output_classes import (
+    TerminalOutput,
+    TelegramOutput,
+    Commands_Handler,
+)
+
+terminal_out = TerminalOutput()
+
+terminal_handler = Commands_Handler(terminal_out)
 
 
 def load_ab() -> AddressBook:
@@ -312,8 +321,7 @@ def get_list_for_prediction():
     address_for_pred = [
         str(rec.address) for rec in address_book.values() if rec.address
     ]
-    phone_for_pred = [str(rec.phones)
-                      for rec in address_book.values()if rec.phones]
+    phone_for_pred = [str(rec.phones) for rec in address_book.values() if rec.phones]
     phones = [phone[1:-1] for phone in phone_for_pred]
     list_for_predict = [command for commands in COMMANDS.keys() for command in commands]
     list_for_predict.extend(name_for_pred)
@@ -347,10 +355,10 @@ def main():
         )
         command, data = parser(user_input)
         if command == exit:
-            print("Buy!")
+            terminal_handler.send_message("Buy!")
             break
         result = command(data)
-        print(result)
+        terminal_handler.send_message(result)
 
 
 if __name__ == "__main__":
