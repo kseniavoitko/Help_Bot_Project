@@ -14,14 +14,24 @@ from prompt_toolkit.completion import WordCompleter
 import pickle
 from pathlib import Path
 import shutil
+from help_bot.output_classes import (
+    TerminalOutput,
+    TelegramOutput,
+    Commands_Handler,
+)
+
+terminal_out = TerminalOutput()
+
+terminal_handler = Commands_Handler(terminal_out)
 
 notepad = Notepad()
+
 
 def get_path() -> Path:
     sourse = Path("notes.bin")
     destination = Path.home()
     path = destination.joinpath(sourse)
-    open(path, 'a').close()
+    open(path, "a").close()
 
     return path
 
@@ -31,13 +41,13 @@ path = get_path()
 try:
     with open(path, "rb") as f:
         try:
-            notepad = pickle.load(f) 
+            notepad = pickle.load(f)
         except EOFError:
-            print('File "notes.bin" EOFError')
+            terminal_handler.send_message('File "notes.bin" EOFError')
         except pickle.UnpicklingError:
-            print('File "notes.bin" pickle.UnpicklingError')
+            terminal_handler.send_message('File "notes.bin" pickle.UnpicklingError')
 except FileNotFoundError:
-    print('File "notes.bin" FileNotFoundError')
+    terminal_handler.send_message('File "notes.bin" FileNotFoundError')
 
 
 def input_error(func):
@@ -49,10 +59,11 @@ def input_error(func):
         except DeadlineError:
             result = f'Not added. False deadline format. Input "dd-mm-yyyy"'
         except ValueError:
-            result = "ValueError"            
+            result = "ValueError"
         except IndexError:
             result = "Give me parameters please."
         return result
+
     return wrapper
 
 
@@ -60,12 +71,12 @@ def input_error(func):
 def add_command(*args):
     title = Title(args[0])
     description = Description(args[1])
-    deadline = Deadline(args[2]) if len(args)>2 and args[2]!="" else "" 
+    deadline = Deadline(args[2]) if len(args) > 2 and args[2] != "" else ""
     number = notepad.get_number()
     data_create = datetime.now().date().strftime("%d-%m-%Y")
-    tag = args[3].strip().split(",") if len(args)>3 else ""
+    tag = args[3].strip().split(",") if len(args) > 3 else ""
     if len(tag) > 1:
-        tags = Tags(tag[0]) 
+        tags = Tags(tag[0])
         rec = Record(number, data_create, title, description, tags, deadline, state="")
         count = 0
         for i in tag:
@@ -74,7 +85,7 @@ def add_command(*args):
                 rec.add_tag(tags)
             count = 1
     else:
-        tags = Tags(args[3]) if len(args)>3 else ""
+        tags = Tags(args[3]) if len(args) > 3 else ""
         rec = Record(number, data_create, title, description, tags, deadline, state="")
     return notepad.add_record(rec)
 
@@ -122,7 +133,7 @@ def change_state_command(*args):
 @input_error
 def change_tag_command(*args):
     old_tag = Tags(args[1].strip())
-    new_tag = Tags(args[2].strip()) if len(args)>2 else Tags("")
+    new_tag = Tags(args[2].strip()) if len(args) > 2 else Tags("")
     rec: Record = notepad.get(str(args[0]))
     if rec:
         return rec.change_tag(old_tag, new_tag)
@@ -155,13 +166,23 @@ def del_command(*args):
         return notepad.numerated(number)
     return f"No record {number} in notepad"
 
+
 def header():
-    header = "|{:^6}|{:^12}|{:^18}|{:^60}|{:^12}|{:^9}|{:^6}|{:^18}|".format('Number','Data_create','Title','Description','Deadline','Status','Left','Tags') 
+    header = "|{:^6}|{:^12}|{:^18}|{:^60}|{:^12}|{:^9}|{:^6}|{:^18}|".format(
+        "Number",
+        "Data_create",
+        "Title",
+        "Description",
+        "Deadline",
+        "Status",
+        "Left",
+        "Tags",
+    )
     return header
 
 
 def str_():
-    str_ = "-"*150
+    str_ = "-" * 150
     return str_
 
 
@@ -171,17 +192,19 @@ def show_all_command(*args):
 
 def show_pages_command(*args):
     try:
-        page = int(args[0])        
+        page = int(args[0])
     except ValueError:
         page = 5
     except IndexError:
-        page = 5 
+        page = 5
 
     i = 0
     for rec in notepad.iterator(page):
         i += 1
-        print("\n",f"-page {i}-")
-        print(f"{str_()}\n{header()}\n{str_()}\n{rec}\n{str_()}") 
+        terminal_handler.send_message("\n", f"-page {i}-")
+        terminal_handler.send_message(
+            f"{str_()}\n{header()}\n{str_()}\n{rec}\n{str_()}"
+        )
     return ""
 
 
@@ -195,29 +218,30 @@ def search_str_command(*args):
 def tag_command(*args):
     tag_list = args[0].strip().split(",")
     tag_str = notepad.tag_str(tag_list)
-    if tag_str =="":
+    if tag_str == "":
         return "Not found"
-    return f"{str_()}\n{header()}\n{str_()}\n{tag_str}\n{str_()}" 
+    return f"{str_()}\n{header()}\n{str_()}\n{tag_str}\n{str_()}"
+
 
 def help_command(*args):
     result = ""
     helper = {
-            'Допомога': '(help)',
-            'Вихід': '(exit, close, bye, good bye, stop)', 
-            'Додати запис': '(add) Назва;Зміст;Дедлайн;Тегі,розділені комою',
-            'Видалити запис': '(delete, remove) Номер рядка',
-            'Перегляд нотатків': '(show all)',
-            'Перегляд по сторінкам': '(show pages) Кількість сторінок',
-            'Пошук за нотатками': '(search, find) Пошукове слово ',
-            'Пошук за тегами': '(tag) Тегі,розділені комою ',
-            'Редагувати назву': '(change title) Номер рядка;Нова назва',
-            'Редагувати зміст': '(change text) Номер рядка;Новий зміст',
-            'Редагувати дедлайн': '(change deadline) Номер рядка;Новий дедлайн',
-            'Редагувати статус': '(change state) Номер рядка;примітка',
-            'Редагувати тег': '(change tag) Номер рядка;Старий тег;Новий тег',
-            'Додати тег': '(+) Номер рядка;Тегі,розділені комою'
-            }
-    for key,value in helper.items():
+        "Допомога": "(help)",
+        "Вихід": "(exit, close, bye, good bye, stop)",
+        "Додати запис": "(add) Назва;Зміст;Дедлайн;Тегі,розділені комою",
+        "Видалити запис": "(delete, remove) Номер рядка",
+        "Перегляд нотатків": "(show all)",
+        "Перегляд по сторінкам": "(show pages) Кількість сторінок",
+        "Пошук за нотатками": "(search, find) Пошукове слово ",
+        "Пошук за тегами": "(tag) Тегі,розділені комою ",
+        "Редагувати назву": "(change title) Номер рядка;Нова назва",
+        "Редагувати зміст": "(change text) Номер рядка;Новий зміст",
+        "Редагувати дедлайн": "(change deadline) Номер рядка;Новий дедлайн",
+        "Редагувати статус": "(change state) Номер рядка;примітка",
+        "Редагувати тег": "(change tag) Номер рядка;Старий тег;Новий тег",
+        "Додати тег": "(+) Номер рядка;Тегі,розділені комою",
+    }
+    for key, value in helper.items():
         result += f"{key:24}:   {value}\n"
     return result
 
@@ -233,28 +257,29 @@ def unknown_command(*args):
 def hello_command(*args):
     return "How can I help you?>>>"
 
+
 def switcher_command(*args):
     switcher()
 
 
 COMMANDS = {
-            add_command: ("add", ),
-            add_tag_command: ("+", ),
-            change_title_command: ("change title", ),
-            change_text_command: ("change text", ),
-            change_deadline_command: ("change deadline", ),
-            change_state_command: ("change state", ),
-            change_tag_command: ("change tag", ),
-            del_command: ("delete", "remove"),
-            hello_command: ("hello", ),
-            show_all_command: ("show all", ),
-            show_pages_command: ("show pages", ),
-            search_str_command: ("search", "find"),
-            tag_command: ("tag", "tags"),
-            help_command: ("help", "help"),
-            exit_command: ("exit", "close", "bye", "good bye", "stop"),
-            switcher_command: ("switcher")
-            }
+    add_command: ("add",),
+    add_tag_command: ("+",),
+    change_title_command: ("change title",),
+    change_text_command: ("change text",),
+    change_deadline_command: ("change deadline",),
+    change_state_command: ("change state",),
+    change_tag_command: ("change tag",),
+    del_command: ("delete", "remove"),
+    hello_command: ("hello",),
+    show_all_command: ("show all",),
+    show_pages_command: ("show pages",),
+    search_str_command: ("search", "find"),
+    tag_command: ("tag", "tags"),
+    help_command: ("help", "help"),
+    exit_command: ("exit", "close", "bye", "good bye", "stop"),
+    switcher_command: ("switcher"),
+}
 
 
 def create_predict() -> None:
@@ -271,24 +296,25 @@ def create_predict() -> None:
     return list_for_predict
 
 
-def parser(text:str):
+def parser(text: str):
     for cmd, kwds in COMMANDS.items():
         for kwd in kwds:
             if text.lower().startswith(kwd):
-                data = text[len(kwd):].strip().split(";")
-                return cmd, data 
+                data = text[len(kwd) :].strip().split(";")
+                return cmd, data
     return unknown_command, []
 
 
 def main():
-    print("\033[36m","Hello! Welcome to Notepad! Input help for help\033[0m")
-
+    terminal_handler.send_message(
+        "\033[36m Hello! Welcome to Notepad! Input help for help\033[0m"
+    )
 
     while True:
         user_input = prompt(">>> ", completer=create_predict())
         cmd, data = parser(user_input)
         result = cmd(*data)
-        print(f"\033[36m{result}\033[0m")
+        terminal_handler.send_message(f"\033[36m{result}\033[0m")
         if cmd == exit_command:
             notepad.save_to_file()
             break
